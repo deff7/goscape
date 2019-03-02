@@ -27,9 +27,9 @@ Commands:
 
 Supported entities:
 
-- HTML - escape and unescape HTML offending characters
-- URL - escape and unescape URL query
-- Base64 - encode and decode Base64 strings
+- `html` - escape and unescape HTML offending characters
+- `url` - escape and unescape URL query
+- `base64` - encode and decode Base64 strings
 
 ### Examples
 
