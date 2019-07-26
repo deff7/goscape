@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"html"
@@ -9,6 +10,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"strings"
 )
 
 var usage = `goscape is simple tool to encoding and decoding web-specific values
@@ -24,6 +26,7 @@ Entities:
 	html   - Escape/unescape HTML offending characters
 	url    - Encode/decode URL string
 	base64 - Encode/decode Base64
+	json   - Esapce/unescape JSON as string
 `
 
 type entityType int
@@ -32,6 +35,7 @@ const (
 	typeHTML entityType = iota
 	typeURL
 	typeBase64
+	typeJSON
 )
 
 func encode(src string, t entityType) (string, error) {
@@ -43,10 +47,15 @@ func encode(src string, t entityType) (string, error) {
 		return url.QueryEscape(src), nil
 	case typeBase64:
 		return base64.StdEncoding.EncodeToString([]byte(src)), nil
+	case typeJSON:
+		raw, err := json.Marshal(src)
+		if err != nil {
+			return "", err
+		}
+		return string(raw), nil
 	default:
 		return "", fmt.Errorf("unknown type %d", t)
 	}
-	return "", nil
 }
 
 func decode(src string, t entityType) (string, error) {
@@ -58,10 +67,23 @@ func decode(src string, t entityType) (string, error) {
 	case typeBase64:
 		out, err := base64.StdEncoding.DecodeString(src)
 		return string(out), err
+	case typeJSON:
+		src = strings.TrimSpace(src)
+		if !strings.HasPrefix(src, `"`) {
+			src = `"` + src
+		}
+		if !strings.HasSuffix(src, `"`) {
+			src = src + `"`
+		}
+		var out string
+		err := json.Unmarshal([]byte(src), &out)
+		if err != nil {
+			return "", err
+		}
+		return out, nil
 	default:
 		return "", fmt.Errorf("unknown type %d", t)
 	}
-	return "", nil
 }
 
 type commandType int
@@ -97,6 +119,7 @@ func getEntity(entity string) (entityType, error) {
 		"html":   typeHTML,
 		"url":    typeURL,
 		"base64": typeBase64,
+		"json":   typeJSON,
 	}
 
 	t, ok := typeMapping[entity]

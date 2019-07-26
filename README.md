@@ -30,11 +30,12 @@ Supported entities:
 - `html` - escape and unescape HTML offending characters
 - `url` - escape and unescape URL query
 - `base64` - encode and decode Base64 strings
+- `json` - escape and unescape JSON stored in outher JSON's strings
 
 ### Examples
 
 ```
-> printf "abc def/абв" | goscape encode url`
+> printf "abc def/абв" | goscape encode url
 abc+def%2F%D0%B0%D0%B1%D0%B2
 ```
 

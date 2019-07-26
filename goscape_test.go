@@ -25,6 +25,11 @@ func TestEncodeDecode(t *testing.T) {
 			in:   `{"foo": "bar"}`,
 			want: `eyJmb28iOiAiYmFyIn0=`,
 		},
+		{
+			t:    typeJSON,
+			in:   `{"foo": "bar"}`,
+			want: `"{\"foo\": \"bar\"}"`,
+		},
 	} {
 		got, err := encode(tc.in, tc.t)
 		if err != nil {
